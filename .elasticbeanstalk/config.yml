@@ -1,0 +1,9 @@
+branch-defaults:
+  master:
+    environment: tpv-mgmt-prod
+global:
+  application_name: tpv-mgmt
+  default_ec2_keyname: tpv-prod
+  default_platform: 64bit Amazon Linux 2017.09 v2.6.4 running PHP 7.1
+  default_region: us-east-1
+  sc: git

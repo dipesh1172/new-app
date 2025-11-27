@@ -1,0 +1,180 @@
+.app-header.navbar, .app-header.navbar .navbar-brand {
+	height: 55px;
+	background-size: 125px auto;
+}
+
+.hide {
+    display:none;
+}
+
+.show {
+    display:block;
+}
+
+.header-fixed .app-body {
+	margin-top: 55px;
+}
+
+.padding-right-10 {
+	padding-right: 10px;
+}
+
+.padding-right-15 {
+	padding-right: 15px;
+}
+
+ul.pagination li.active span {
+	position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #000000;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+ul.pagination li.disabled span {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #000000;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.inline {
+    display: inline;
+}
+
+body {
+    background-image: url('../img/topography.png');
+}
+
+.app-header.navbar .navbar-brand {
+    background-image: url('../img/logo.svg');
+    background-size: 155px 55px;
+}
+
+/* Checkbox Toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider-success {
+  background-color: $green !important;
+}
+
+input:checked + .slider-warning {
+  background-color: $yellow !important;
+}
+
+input:checked + .slider-danger {
+  background-color: $red !important;
+}
+
+input:checked + .slider {
+  background-color: $blue;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px $blue;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+// select drop down css
+select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.form-control:not([size]):not([multiple]), .input-group-lg > select.input-group-addon:not([size]):not([multiple]), .input-group-lg > .input-group-btn > select.btn:not([size]):not([multiple]) {
+  height: calc(2.7rem + 2px);
+}
+
+/* Form Input Height*/
+select.form-control:not([size]):not([multiple]) {
+  height: calc(2.3rem + 2px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.dashboard-loader {
+    display: none;
+}
+
+.heading {
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.page-buttons {
+  margin-bottom: 15px;
+}
+
+.page-buttons .form-group, .page-buttons .form-group a {
+  margin-right: 10px;
+}
+
+@media (min-width: 992px) {
+  .sidebar-minimized .sidebar:not(:hover) {
+      width: 50px;
+  }
+
+  .sidebar-minimized .main {
+      margin-left: 50px;
+  }
+
+  .sidebar-minimized .app-footer {
+      margin-left: 50px;
+  }
+}
+
+.w-overlay {
+  position:absolute;
+  width:102%;
+  height:102%;
+  left:-1%;
+  top:-2%;
+  background-color:rgba(0,0,0,0.15);
+  z-index:100;
+}

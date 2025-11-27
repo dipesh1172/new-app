@@ -1,0 +1,106 @@
+version: 2.1
+orbs:
+  mattermost-plugin-notify: nathanaelhoun/mattermost-plugin-notify@1.2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/php:7.1-node-browsers
+    working_directory: ~/repo
+    environment:
+      CIRCLE_COMMIT_URL: << pipeline.project.git_url >>/commit/<<pipeline.git.revision>>
+    steps:
+      - run:
+          name: Notifying AnswernetChat of deployment
+          command: |
+            curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"[$CIRCLE_JOB $CIRCLE_BUILD_NUM]($CIRCLE_BUILD_URL): deploying [$CIRCLE_PROJECT_REPONAME](<< pipeline.project.git_url >>) [v$CIRCLE_TAG]($CIRCLE_COMMIT_URL) to production...\", \"channel\": \"engineering\"}" https://mm.answernet.com/hooks/8heedrpt5jdmxpsnnwa4ajdnee
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "0d:41:86:35:60:6c:9e:e3:26:b9:c2:37:e5:1e:f0:cc"
+            - "ce:b1:ea:6e:42:e3:dd:f7:d3:73:2a:ab:ed:02:64:02"
+      - run:
+          name: Fetching tpv-models
+          command: ssh-agent bash -c "ssh-add /home/circleci/.ssh/id_rsa_0d418635606c9ee326b9c237e51ef0cc; git submodule init; git submodule update --recursive --remote"
+      - run:
+          name: Installing deployment dependencies
+          working_directory: /
+          command: |
+            sudo apt-get -y -qq update --allow-releaseinfo-change
+            sudo apt-get install python-pip python-dev build-essential libpng-dev -y
+            sudo pip install awscli==1.16.9 awsebcli==3.14.4
+            sudo pip install python-dateutil==2.8.2
+            sudo npm install -g npm@8.19.3
+            npm -v
+      - run:
+          name: Get config from S3
+          command: aws s3 cp s3://tpv-env/prod.env ~/repo/.env
+      - run:
+          name: Write APP Name to .env
+          command: echo 'APP_NAME="TPV.com MGMT"' >> ~/repo/.env
+      - run:
+          name: Write APP URL to .env
+          command: echo "APP_URL=https://mgmt.tpvhub.com" >> ~/repo/.env
+      - run:
+          name: Write sentry configuration to .env
+          command: |
+            echo "SENTRY_DSN=https://e3ccb4a031d44446ae8d699bd4e3aeac@sentry.io/291406" >> ~/repo/.env
+      - run:
+          name: Install PHP Extensions
+          command: sudo docker-php-ext-install gd
+      - run: composer install -n --no-dev --optimize-autoloader --prefer-dist
+      - run: npm install --no-optional
+      - run:
+          name: Set public tmp directory and permissions
+          command: mkdir -p public/tmp && chmod -R 777 public/tmp
+      - run:
+          name: Create storage/log directory
+          command: mkdir -p storage/logs
+      - run:
+          name: Setup laravel.log
+          command: touch storage/logs/laravel.log
+      - run:
+          name: Set storage directory permissions
+          command: chmod -R 777 storage
+      - run:
+          name: Setup bootstrap cache
+          command: chmod -R 777 bootstrap/cache
+      - run:
+          name: Setup eztpv documents directory
+          command: mkdir -p public/uploads/eztpv/documents
+      - run:
+          name: Compile Javascript & CSS for Browser Testing
+          command: npm run production
+      - run:
+          name: Clear Compiled
+          command: php artisan clear-compiled
+      - run:
+          name: Clear Artisan
+          command: php artisan route:clear && php artisan config:clear && php artisan view:clear
+      - run:
+          name: Write tag to version file
+          command: echo $CIRCLE_TAG > resources/views/version.blade.php
+      - run:
+          name: Deploying application
+          command: eb deploy --label ${CIRCLE_TAG} ${CIRCLE_PROJECT_REPONAME}-prod
+    #   - run:
+    #       name: Notifying Slack of deployment
+    #       command: |
+    #         curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"Deployed *$CIRCLE_PROJECT_REPONAME* v$CIRCLE_TAG to production\", \"channel\": \"engineering\", \"username\":\"OpsBot\", \"icon_emoji\": \":robot:\"}" https://hooks.slack.com/services/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
+    #         curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"Released *$CIRCLE_PROJECT_REPONAME* v$CIRCLE_TAG to production: \n \`\`\`$(git log --pretty="%h - %s (%an)" $(git tag --sort=-version:refname | head -n 2 | sort | xargs | sed -e 's/ /../g'))\`\`\`\", \"channel\": \"releases\", \"username\":\"ReleaseBot\"}" https://hooks.slack.com/services/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      curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"Released *$CIRCLE_PROJECT_REPONAME* v$CIRCLE_TAG to production: \n \`\`\`$(git log --pretty="%h - %s (%an)" $(git tag --sort=-version:refname | head -n 2 | sort | xargs | sed -e 's/ /../g'))\`\`\`\", \"channel\": \"releases\", \"username\":\"ReleaseBot\"}" https://hooks.slack.com/services/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
+      - run:
+          name: Notifying AnswernetChat of release changes
+          command: |
+            curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"[$CIRCLE_PROJECT_REPONAME v$CIRCLE_TAG](<< pipeline.project.git_url >>) ([$(git rev-parse --short HEAD)]($CIRCLE_COMMIT_URL)) has been released. Changelog:\n\`\`\`\n$(git log --pretty="%h - %s (%an)" $(git tag --sort=-version:refname | head -n 3 | sort | xargs -n 2 | sed -e 's/ /../g'))\n\`\`\`\", \"channel\": \"releases\"}" https://mm.answernet.com/hooks/8heedrpt5jdmxpsnnwa4ajdnee
+      - mattermost-plugin-notify/status:
+          webhook: https://mm.answernet.com/plugins/com.github.mattermost.plugin-circleci/hooks/01tKuGqNfmw0lWLCTxhdW7ENgOieOl33
+
+workflows:
+  version: 2
+  tagged-build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/

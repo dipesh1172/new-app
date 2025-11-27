@@ -1,0 +1,105 @@
+import Vue from 'vue';
+import Vuex from 'vuex';
+import Vuesax from 'vuesax';
+import 'vuesax/dist/vuesax.css';
+import 'material-icons/iconfont/material-icons.css';
+import Moment from 'moment';
+import Debug from 'debug';
+import VueRouter from 'vue-router';
+import VueMoment from 'vue-moment';
+import VueLogr from 'vuelogr';
+import Store from './store';
+
+import Main from './pages/Main.vue';
+import Agents from './pages/Agents.vue';
+import Queues from './pages/Queues.vue';
+import Queues2 from './pages/Queues_new.vue';
+import ControlCenter from './pages/ControlCenter.vue';
+import ControlCenter2 from './pages/ControlCenter_new.vue';
+import CCdash from './pages/CCdash.vue';
+import ClientData from './pages/ClientData.vue';
+import PendingStatus from './pages/PendingStatus.vue';
+import Television from './pages/Television.vue';
+import Alerts from './pages/Alerts.vue';
+import Surveys from './pages/Surveys.vue';
+import LiveAgent from './pages/LiveAgent.vue';
+import NotReady from './pages/NotReady.vue';
+
+Vue.use(Vuex);
+Vue.use(VueRouter);
+Vue.use(VueMoment);
+Vue.use(VueLogr);
+Vue.use(Vuesax, {
+    theme: {
+        colors: {
+            primary: 'rgb(91, 60, 196)',
+            success: 'rgb(23, 201, 100)',
+            danger: 'rgb(242, 19, 93)',
+            warning: 'rgb(255, 130, 0)',
+            dark: 'rgb(36, 33, 69)',
+        },
+    },
+});
+
+window.moment = Moment;
+window.LogBuilder = Debug;
+
+const routes = [
+    {
+        path: '/control-center', component: ControlCenter, name: 'ControlCenter', label: 'Control Center (old)', show: false, 
+    },
+    {
+        path: '/', component: ControlCenter2, name: 'ControlCenter2', label: 'Control Center', show: true,
+    },
+    {
+        path: '/live-agent', component: LiveAgent, name: 'LiveAgent', label: 'Live Agent', show: true, 
+    },
+    {
+        path: '/not-ready', component: NotReady, name: 'NotReady', label: 'Not Ready', show: true, 
+    },
+    {
+        path: '/agents', component: Agents, name: 'Agents', label: 'Agents', show: true, 
+    },
+    {
+        path: '/call-center', component: CCdash, name: 'CallCenter', label: 'Call Center', show: false, 
+    },
+    {
+        path: '/real-time', component: Queues, name: 'Queues', label: 'Real Time Stats (old)', show: false, 
+    },
+    {
+        path: '/real-time-2', component: Queues2, name: 'Queues2', label: 'Real Time Stats', show: true, 
+    },
+    {
+        path: '/client-data', component: ClientData, name: 'ClientData', label: 'Client Data', show: false, 
+    },
+    {
+        path: '/pending', component: PendingStatus, name: 'PendingStatus', label: 'Pending Status', show: false, 
+    },
+    {
+        path: '/tv', component: Television, name: 'Television', label: 'Television', show: true, 
+    },
+    {
+        path: '/alerts', component: Alerts, name: 'Alerts', label: 'Alerts', show: true, 
+    },
+    {
+        path: '/surveys', component: Surveys, name: 'Surveys', label: 'Surveys', show: true, 
+    },
+];
+
+const router = new VueRouter({
+    linkActiveClass: 'active',
+    routes,
+});
+
+const store = new Vuex.Store(Store);
+window.store = store;
+
+const app = new Vue(Vue.util.extend(Main, {
+    store,
+    router,
+    data: {
+        env: '{{ env(\'APP_ENV\') }}',
+    },
+}));
+
+app.$mount('#main-content');

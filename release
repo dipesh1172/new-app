@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if ! type release-it > /dev/null; then
+    echo 'Error: release-it is not installed.  Please run:  npm install -g release-it' >&2
+    exit 1
+fi
+
+release-it --no-npm.publish

@@ -1,0 +1,28 @@
+.breadcrumb {
+    margin-bottom: 0.5rem;
+}
+.filter-navbar {
+    box-shadow: 0px 10px 5px -5px rgba(184, 173, 184, 1);
+}
+body:not(.sidebar-minimized) .filter-bar-row:not(.mobile) {
+    position: fixed;
+    z-index: 1000;
+    top: 100px;
+    left: $sidebar-width;
+}
+body:not(.sidebar-minimized) .filter-bar-row.filter-bar-replaced:not(.mobile) {
+    top: 55px;
+}
+.breadcrumb-right {
+    border-bottom: 1px solid #a4b7c1;
+    background-color: #fff;
+    padding: 0.5rem 1rem;
+}
+.text-info {
+    font-size: 2em;
+}
+.chartColumn-container {
+    height: 250px;
+    width: 100%;
+    position: relative;
+}

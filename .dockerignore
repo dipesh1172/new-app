@@ -1,0 +1,6 @@
+node_modules
+storage/logs/*.log
+public/tmp/*
+vendor
+bootstrap/cache/*
+.git
